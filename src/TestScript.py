@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 from ruamel.yaml import YAML
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_crypto_ssh_oper as ssh_oper
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
@@ -89,16 +90,25 @@ if __name__ == "__main__":
                                       password=device.password,
                                       protocol=device.scheme)
 
-    logger.info(f"Connnect to {device}")
+    logger.info("Connnect to " + device)
 
     # create CRUD service
     crud = CRUDService()
 
     # create system time object
     system_time = xr_shellutil_oper.SystemTime()
+    ssh_config = ssh_oper.Ssh()
+
     # read system time from device
     system_time = crud.read(provider, system_time)
+    ssh_config = crud.read(provider, ssh_config)
 
     # Print system time
     print("System uptime is " +
           str(timedelta(seconds=system_time.uptime.uptime)))
+
+    for item in ssh_config.session.history.incoming_sessions.session_history_info:
+        print(item.authentication_type)
+
+    for item in ssh_config.session.detail.incoming_sessions.session_detail_info:
+        print(item.key_exchange)

@@ -3,7 +3,7 @@ from datetime import timedelta
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
-from ydk.models.ietf import ietf_interfaces
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_crypto_ssh_oper as ssh_oper
 
 if __name__ == "__main__":
     """Main execution path"""
@@ -20,16 +20,23 @@ if __name__ == "__main__":
 
     # Top Level Object
     system_time = xr_shellutil_oper.SystemTime()
-    interface_name = ietf_interfaces.Interfaces()
+    ssh_config = ssh_oper.Ssh()
 
     # read system time from device
     system_time = crud.read(provider, system_time)
-    interface_name = crud.read(provider, interface_name)
+    ssh_config = crud.read(provider, ssh_config)
 
     # Print system time
     print("System uptime is " + str(timedelta(seconds=system_time.uptime.uptime)))
+    print("Test " + system_time.uptime.host_name)
 
-    # TODO get interface name or description or something like that
-    print("Interface is " + str(interface_name.interface['Loopback0'].name))
+    # for item in ssh_config.session.rekey.incoming_sessions.session_rekey_info:
+    #     print(item.session_id)
+
+    for item in ssh_config.session.history.incoming_sessions.session_history_info:
+        print(item.authentication_type)
+
+    for item in ssh_config.session.detail.incoming_sessions.session_detail_info:
+        print(item.key_exchange)
 
     exit()
