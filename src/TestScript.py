@@ -9,6 +9,8 @@ from urllib.parse import urlparse
 from ruamel.yaml import YAML
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_crypto_ssh_oper as ssh_oper
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_oper as sr_oper
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_cfg as sr_config
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
@@ -90,7 +92,7 @@ if __name__ == "__main__":
                                       password=device.password,
                                       protocol=device.scheme)
 
-    logger.info("Connnect to " + device)
+    logger.info(f"Connnect to {device}")
 
     # create CRUD service
     crud = CRUDService()
@@ -98,17 +100,24 @@ if __name__ == "__main__":
     # create system time object
     system_time = xr_shellutil_oper.SystemTime()
     ssh_config = ssh_oper.Ssh()
+    sr_mapping = sr_oper.Srms()
+    sr_config_mapping = sr_config.Sr()
 
     # read system time from device
     system_time = crud.read(provider, system_time)
     ssh_config = crud.read(provider, ssh_config)
+    sr_mapping = crud.read(provider, sr_mapping)
+    logger.info(crud.read(provider, sr_config_mapping))
 
     # Print system time
-    print("System uptime is " +
+    logger.info("System uptime is " +
           str(timedelta(seconds=system_time.uptime.uptime)))
 
     for item in ssh_config.session.history.incoming_sessions.session_history_info:
-        print(item.authentication_type)
+        logger.info(item.authentication_type)
 
     for item in ssh_config.session.detail.incoming_sessions.session_detail_info:
-        print(item.key_exchange)
+        logger.info(item.key_exchange)
+
+    for item in sr_mapping.mapping.mapping_ipv4.mapping_mi:
+        logger.info(item.ip)
