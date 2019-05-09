@@ -5,7 +5,7 @@ from flask import Flask
 
 from ruamel.yaml import YAML
 
-from src.server.controller import IndexView, LoadConfigView
+from src.server.controller import IndexView, LoadConfigView, StoreConfigView
 
 boolean_dict = {
     "true": True,
@@ -70,6 +70,7 @@ def create_app(test_config=None):
     # Add Components
     app.add_url_rule("/", view_func=IndexView.as_view('index', config))
     app.add_url_rule("/configs", view_func=LoadConfigView.as_view('loadConfig', config))
+    app.add_url_rule("/store", view_func=StoreConfigView.as_view('storeConfig', config))
 
     return app
 

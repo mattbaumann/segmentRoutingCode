@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlparse
+import requests
 
 from ruamel.yaml import YAML
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
@@ -33,8 +34,12 @@ def parse_bool(value_string):
         return boolean_dict[value_string.lower()]
 
 
-def load_config():
-    parser = ArgumentParser()
+def save_data(data):
+    yamlParser = YAML(typ='safe')
+    return yamlParser.dump(data)
+
+
+def load_config(parser: ArgumentParser):
     parser.add_argument("-c", "--config", help="sets the relative path to default config",
                         default="./Test.yaml")
     # Parse parameters
@@ -80,7 +85,11 @@ def load_logger():
 
 
 if __name__ == "__main__":
-    config = load_config()
+    parser = ArgumentParser()
+
+    config = load_config(parser)
+
+
 
     device = urlparse(config["config"]["host"])
 
@@ -123,3 +132,4 @@ if __name__ == "__main__":
     for item in sr_mapping.mapping.mapping_ipv4.mapping_mi:
         logger.info(item.ip)
 
+    requests.put("http://localhost/store", data=save_data(sr_mapping))
