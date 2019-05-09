@@ -1,3 +1,4 @@
+flask
 alabaster==0.7.12
 Babel==2.6.0
 docutils==0.14

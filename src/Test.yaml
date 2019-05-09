@@ -4,3 +4,6 @@ config:
 
   logging:
     verbose: On
+
+  flask:
+    DEBUG: On

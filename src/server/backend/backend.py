@@ -1,7 +1,7 @@
+#!/usr/bin/env python3
 # import providers, services and models
 import logging
 import os
-import sys
 from argparse import ArgumentParser
 from datetime import timedelta
 from pathlib import Path
@@ -33,30 +33,32 @@ def parse_bool(value_string):
         return boolean_dict[value_string.lower()]
 
 
+def convert_bool(config_dict):
+    for key, value in config_dict.items():
+        if isinstance(value, str) and value.lower() in boolean_dict:
+            config_dict[key] = parse_bool(value)
+        if isinstance(value, dict):
+            convert_bool(value)
+
+
 def load_config():
-    parser = ArgumentParser()
-    parser.add_argument("-c", "--config", help="sets the relative path to default config",
-                        default="./Test.yaml")
-    # Parse parameters
-    args = parser.parse_args()
-
-    assert ("config" in args)
-
     # Parse config
     script_path = Path(os.path.dirname(os.path.abspath(__file__)))
-    absolute_path = Path(script_path, args.config)
+    absolute_path = Path(script_path, "../../Test.yaml")
 
     assert (absolute_path.exists() and absolute_path.is_file())
 
-    yamlParser = YAML(typ='safe')
-    yaml = yamlParser.load(absolute_path)
+    yaml_parser = YAML(typ='safe')
+    yaml = yaml_parser.load(absolute_path)
 
     assert (yaml['version'] <= config_version)
+
+    convert_bool(yaml)
 
     return yaml
 
 
-def load_logger():
+def load_logger(config):
     handler = logging.StreamHandler()
     formatter = logging.Formatter(("%(asctime)s - %(name)s - "
                                    "%(levelname)s - %(message)s"))
@@ -68,7 +70,7 @@ def load_logger():
     app_logger = logging.getLogger("APP")
     app_logger.addHandler(handler)
 
-    verbose = parse_bool(config["config"]["logging"]["verbose"])
+    verbose = config["config"]["logging"]["verbose"]
 
     if verbose:
         ydk_logger.setLevel(logging.INFO)
@@ -79,12 +81,11 @@ def load_logger():
     return app_logger
 
 
-if __name__ == "__main__":
-    config = load_config()
+def load_data(config):
 
     device = urlparse(config["config"]["host"])
 
-    logger = load_logger()
+    logger = load_logger(config)
 
     # create NETCONF session
     provider = NetconfServiceProvider(address=device.hostname,
@@ -100,26 +101,22 @@ if __name__ == "__main__":
 
     # create system time object
     system_time = xr_shellutil_oper.SystemTime()
-    ssh_config = ssh_oper.Ssh()
-    sr_mapping = sr_oper.Srms()
     sr_config_mapping = sr_config.Sr()
 
     # read system time from device
     system_time = crud.read(provider, system_time)
-    ssh_config = crud.read(provider, ssh_config)
-    sr_mapping = crud.read(provider, sr_mapping)
     logger.info(crud.read(provider, sr_config_mapping))
 
     # Print system time
     logger.info("System uptime is " +
           str(timedelta(seconds=system_time.uptime.uptime)))
 
-    for item in ssh_config.session.history.incoming_sessions.session_history_info:
-        logger.info(item.authentication_type)
+    titles = []
+    for item in sr_config_mapping.traffic_engineering.policies:
+        titles.append(item.policy_name)
 
-    for item in ssh_config.session.detail.incoming_sessions.session_detail_info:
-        logger.info(item.key_exchange)
+    return titles
 
-    for item in sr_mapping.mapping.mapping_ipv4.mapping_mi:
-        logger.info(item.ip)
 
+if __name__ == "__main__":
+    load_data(load_config())
