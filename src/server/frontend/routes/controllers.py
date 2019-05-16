@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, render_template, request
-from server.frontend.extension.db_connection import SRConfig
+from server.frontend.extension.db_connection import Policy, CandidatePath, SegmentList
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -20,8 +20,8 @@ def about():
 @routes.route('/show')
 def show_config():
     # TODO load config from database
-    sr_config = SRConfig.query.filter(config='test').first()
-    print(sr_config)
+    # sr_config = SRConfig.query.filter(config='test').first()
+    # print(sr_config)
     return 'show config'
 
 
