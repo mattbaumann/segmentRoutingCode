@@ -20,9 +20,8 @@ def about():
 @routes.route('/show')
 def show_config():
     # TODO load config from database
-    # sr_config = SRConfig.query.filter(config='test').first()
-    # print(sr_config)
-    return 'show config'
+    sr_config = Policy.query.filter(config='test').first()
+    return render_template('segment_routing/show.html', config=sr_config)
 
 
 @routes.route('/execute', methods=['GET', 'POST'])
