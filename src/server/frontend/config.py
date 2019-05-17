@@ -14,8 +14,8 @@ MYSQL_CURSORCLASS = 'DictCursor'
 SECRET_KEY = 'secret123'
 
 # SQLAlchemy stuff
-# SQLALCHEMY_DATABASE_URI = 'mysql://root:start123@localhost/challp'
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:start123@localhost:5433/challp'
+SQLALCHEMY_DATABASE_URI = 'mysql://root:start123@localhost/challp'
+# SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:start123@localhost:5433/challp'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
