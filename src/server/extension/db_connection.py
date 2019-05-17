@@ -14,7 +14,7 @@ class Policy(db.Model):
     latency = db.Column(db.Integer, nullable=False)
     availability = db.Column(db.Integer, nullable=False)
     # Defince One To Many relashionship with CandidatePath
-    candidate_path = db.relationship('CandidatePath', backref='policy', cascade='all, delete-orphan', lazy='dynamic')
+    candidate_path = db.relationship('CandidatePath')
 
     def __init__(self, name, color, bandwidth, latency, availability):
         self.name = name
@@ -30,7 +30,7 @@ class CandidatePath(db.Model):
     # Foreign Key
     policy_id = db.Column(db.Integer, db.ForeignKey('policy.id'))
     # Defince One To Many relashionship with SegmentList
-    segment_list = db.relationship('SegmentList', backref='policy', cascade='all, delete-orphan', lazy='dynamic')
+    segment_list = db.relationship('SegmentList')
 
     def __init__(self, preference):
         self.preference = preference

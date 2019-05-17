@@ -19,49 +19,33 @@ def about():
 
 @routes.route('/testpolicy')
 def testpolicy():
-    name = 'Policy_1'
-    color = 42
-    bandwidth = 10000
-    latency = 4
-    availability = 1
-    test_policy = Policy(name, color, bandwidth, latency, availability)
+    test_policy = Policy('Policy_1', 42, 10000, 4, 1)
+    test_candidate_path = CandidatePath(13)
+    test_segment_list = SegmentList('MyAwesomeList')
+
+    test_policy.candidate_path.append(test_candidate_path)
+    test_candidate_path.segment_list.append(test_segment_list)
+
     db.session.add(test_policy)
+    db.session.add(test_candidate_path)
+    db.session.add(test_segment_list)
     db.session.commit()
 
     return 'insert policy into db'
 
 
-@routes.route('/testcandidatepath')
-def testcandidatepath():
-    preference = 13
-    test_candidate_path = CandidatePath(preference)
-    db.session.add(test_candidate_path)
-    db.session.commit()
-
-    return 'insert candidate path into db'
-
-
-@routes.route('/testsegmentlist')
-def testsegmentlist():
-    name = 'MyAwesomeList'
-    test_segment_list = SegmentList(name)
-    db.session.add(test_segment_list)
-    db.session.commit()
-
-    return 'insert segment list into db'
-
-
-@routes.route('/show/policy/<name>/')
-def show_config(name):
-    # TODO load config from database
-    policy = Policy.query.filter_by(name=name).first()
+@routes.route('/show/policy/')
+def show_config():
+    policy = Policy.query.all()
     return render_template('show/policy.html', policy=policy)
 
 
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>')
 def show_candidate_path(name, candidate_path_id):
-    candidate_path = CandidatePath.query.filter_by(id=candidate_path_id).first()
-    return render_template('show/candidate_path.html', name=name, candidate_path=candidate_path)
+    policy = Policy.query.join(CandidatePath).all()
+    for item in policy:
+        print(item)
+    return render_template('show/candidate_path.html', name=name, candidate_path=policy)
 
 
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>/segmentlist/<segment_list_id>')
