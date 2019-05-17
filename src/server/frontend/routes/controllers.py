@@ -51,23 +51,23 @@ def testsegmentlist():
     return 'insert segment list into db'
 
 
-@routes.route('/show/policy/<name>')
+@routes.route('/show/policy/<name>/')
 def show_config(name):
     # TODO load config from database
     policy = Policy.query.filter_by(name=name).first()
     return render_template('show/policy.html', policy=policy)
 
 
-@routes.route('/show/candidatepath/<candidate_path_id>')
-def show_candidate_path(candidate_path_id):
+@routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>')
+def show_candidate_path(name, candidate_path_id):
     candidate_path = CandidatePath.query.filter_by(id=candidate_path_id).first()
-    return render_template('show/candidate_path.html', candidate_path=candidate_path)
+    return render_template('show/candidate_path.html', name=name, candidate_path=candidate_path)
 
 
-@routes.route('/show/segmentlist/<segment_list_id>')
-def show_segment_list(segment_list_id):
+@routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>/segmentlist/<segment_list_id>')
+def show_segment_list(name, candidate_path_id, segment_list_id):
     segment_list = SegmentList.query.filter_by(id=segment_list_id).first()
-    return render_template('show/segment_list.html', segment_list=segment_list)
+    return render_template('show/segment_list.html', name=name, candidate_path=candidate_path_id, segment_list=segment_list)
 
 
 @routes.route('/execute', methods=['GET', 'POST'])
@@ -79,7 +79,6 @@ def execute():
         return 'render template for execute script POST method'
 
     return 'execute template for execute script GET method'
-
 
 # TODO if the script is executed, it will create a POST request into a method. The following code has to be in this method
 # sr_config = SRConfig(config)
