@@ -1,18 +1,17 @@
 # import providers, services and models
 import logging
 import os
-import sys
 from argparse import ArgumentParser
 from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlparse
-import requests
 
+import requests
 from ruamel.yaml import YAML
-from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_crypto_ssh_oper as ssh_oper
-from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_oper as sr_oper
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_cfg as sr_config
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_oper as sr_oper
+from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
@@ -86,6 +85,7 @@ def load_logger():
 
 if __name__ == "__main__":
     parser = ArgumentParser()
+    parser.add_argument("-d", type=str, action='append')
 
     config = load_config(parser)
 
