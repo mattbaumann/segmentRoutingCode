@@ -13,3 +13,6 @@ class CandidatePath:
 
     def __str__(self):
         return "Preference %d and paths {%s}" % (self.preference, ",".join(hop.__str__() for hop in self.hops))
+
+    def json(self):
+        return "{preference: %d, hops: %s" % (self.preference, "[" + ",".join(path.json() for path in self.hops) + "]}")

@@ -1,5 +1,11 @@
-from flask import Flask, Blueprint, render_template, request
+import os
+import subprocess
+from pathlib import Path
+
+from flask import Flask, Blueprint, render_template, request, abort
+
 from src.server.extension.db_connection import db, Policy, CandidatePath, SegmentList
+from src.server.utils.http_status import BAD_REQUEST
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -70,17 +76,18 @@ def show_segment_list(name, candidate_path_id, segment_list_id):
     return render_template('show/segment_list.html', name=name, candidate_path=candidate_path_id, segment_list=segment_list)
 
 
+@routes.route('/update', methods=['POST'])
+def update():
+    json = request.json
+    if json is None:
+        abort(BAD_REQUEST)
+    # TODO: Add data update handler
+
+
 @routes.route('/execute', methods=['GET', 'POST'])
-# TODO add config as argument
 def execute():
-    if request.method == 'POST':
-        # TODO execute script
-
-        return 'render template for execute script POST method'
-
-    return 'execute template for execute script GET method'
-
-# TODO if the script is executed, it will create a POST request into a method. The following code has to be in this method
-# sr_config = SRConfig(config)
-# db.session.add(sr_config)
-# db.session.commit()
+    script_path = Path(os.path.dirname(os.path.abspath(__file__)))
+    absolute_path = Path(script_path, "../../backend/backend.py").absolute()
+    args = ["/usr/bin/python3", "/home/matt/YDK-Test-Project/src/backend/backend.py", "-s " + request.url_root]
+    subprocess.Popen(args)
+    return render_template('update/inprogress.html')
