@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint, render_template, request
-from server.frontend.extension.db_connection import db, Policy, CandidatePath, SegmentList
+from src.server.extension.db_connection import db, Policy, CandidatePath, SegmentList
 
 app = Flask(__name__)
 app.config.from_object('config')

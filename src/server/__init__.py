@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from server.frontend.routes.controllers import routes as mod_routes
+from src.server.routes.controllers import routes as mod_routes
 
 app = Flask(__name__)
 app.config.from_object('config')
