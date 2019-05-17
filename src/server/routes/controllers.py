@@ -19,9 +19,9 @@ def about():
 
 @routes.route('/testpolicy')
 def testpolicy():
-    test_policy = Policy('Policy_1', 42, 10000, 4, 1)
-    test_candidate_path = CandidatePath(13)
-    test_segment_list = SegmentList('MyAwesomeList')
+    test_policy = Policy('Policy_2', 123, 123, 123, 123)
+    test_candidate_path = CandidatePath(123)
+    test_segment_list = SegmentList('ItFinallyWorks')
 
     test_policy.candidate_path.append(test_candidate_path)
     test_candidate_path.segment_list.append(test_segment_list)
@@ -37,21 +37,26 @@ def testpolicy():
 @routes.route('/show/policy/')
 def show_config():
     policy = Policy.query.all()
-    return render_template('show/policy.html', policy=policy)
+    return render_template('show/policy.html',
+                           policy=policy)
 
 
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>')
 def show_candidate_path(name, candidate_path_id):
-    policy = Policy.query.join(CandidatePath).all()
-    for item in policy:
-        print(item)
-    return render_template('show/candidate_path.html', name=name, candidate_path=policy)
+    candidate_path = CandidatePath.query.join(Policy, Policy.id == CandidatePath.policy_id).filter(CandidatePath.id == candidate_path_id).all()
+    return render_template('show/candidate_path.html',
+                           name=name,
+                           candidate_path=candidate_path,
+                           candidate_path_id=candidate_path_id)
 
 
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>/segmentlist/<segment_list_id>')
 def show_segment_list(name, candidate_path_id, segment_list_id):
-    segment_list = SegmentList.query.filter_by(id=segment_list_id).first()
-    return render_template('show/segment_list.html', name=name, candidate_path=candidate_path_id, segment_list=segment_list)
+    segment_list = SegmentList.query.join(CandidatePath, CandidatePath.id == SegmentList.candidate_path_id).filter(SegmentList.id == segment_list_id).all()
+    return render_template('show/segment_list.html',
+                           name=name,
+                           candidate_path=candidate_path_id,
+                           segment_list=segment_list)
 
 
 @routes.route('/execute', methods=['GET', 'POST'])

@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Show config</h1>
+    <h1>Show Candidate Path</h1>
     <table class="table table-striped">
         <tr>
             <th>Preference</th>
@@ -10,7 +10,7 @@
         {% for item in candidate_path %}
             <tr>
                 <td>{{item['preference']}}</td>
-                <td><a href="/show/policy/{{name}}/candidatepath/{{candidate_path_id}}/segmentlist/{{candidate_path['id']}}" class="btn btn-primary pull-left" type="submit" value="Segment List Detail">Segment List Detail</a> </td>
+                <td><a href="/show/policy/{{name}}/candidatepath/{{candidate_path_id}}/segmentlist/{{item['id']}}" class="btn btn-primary pull-left" type="submit" value="Segment List Detail">Segment List Detail</a> </td>
             </tr>
         {% endfor %}
     </table>
