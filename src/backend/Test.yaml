@@ -5,6 +5,3 @@ config:
   logging:
     verbose: On
     filename: "Application.log"
-
-  flask:
-    DEBUG: On
