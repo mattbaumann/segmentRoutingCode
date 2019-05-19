@@ -10,7 +10,7 @@ from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
 from src.backend.configuration import load_config
-from src.backend.logging import load_logger
+from src.backend.logConfig import load_logger
 from src.backend.parser import parse_policy
 
 
