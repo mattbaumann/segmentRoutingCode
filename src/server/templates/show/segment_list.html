@@ -10,8 +10,9 @@
         {% for item in segment_list %}
             <tr>
                 <td>{{item['name']}}</td>
-                <td><a href="/show/candidatepath/{{config['id']}}" class="btn btn-primary pull-left" type="submit" value="Policy Detail">Policy Detail</a> </td>
+                <td></td>
             </tr>
         {% endfor %}
     </table>
+    <p><a href="/show/policy/{{name}}/candidatepath/{{candidate_path}}" class="btn btn-primary pull-left" type="submit" value="Back">Go back</a></p>
 {% endblock %}
