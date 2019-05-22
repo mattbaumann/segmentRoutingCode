@@ -1,4 +1,4 @@
-class Label:
+class Label(object):
     label: int
     type: str
 
@@ -8,3 +8,6 @@ class Label:
 
     def __str__(self):
         return "%s label with id: %s" % (self.type, self.label)
+
+    def json(self):
+        return "{label: %d, type: %s}" % (self.label, self.type)

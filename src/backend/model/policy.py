@@ -3,7 +3,7 @@ from typing import List
 from .candidatePath import CandidatePath
 
 
-class Policy:
+class Policy(object):
     name: str
     color: int
     paths: List[CandidatePath]
@@ -20,3 +20,7 @@ class Policy:
         return "Policy %s with color %d leads to {%s}" % (self.name,
                                                           self.color,
                                                           ",".join(path.__str__() for path in self.paths))
+
+    def json(self):
+        return "{name: %s, color: %d, paths: %s" % (self.name, self.color,
+                                                    "[" + ",".join(path.json() for path in self.paths) + "]}")
