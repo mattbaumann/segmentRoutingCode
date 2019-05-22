@@ -58,6 +58,7 @@ def load_config():
 
     args_parser = ArgumentParser()
     args_parser.add_argument("-c", type=str, action="append")
+    args_parser.add_argument("-s", type=str)
 
     args = args_parser.parse_args()
 
@@ -65,11 +66,14 @@ def load_config():
 
     convert_bool(yaml)
 
-    return yaml
+    return yaml, args.s
 
 
 def load_logger(config):
-    handler = logging.StreamHandler()
+    script_path = Path(os.path.dirname(os.path.abspath(__file__)))
+    absolute_path = Path(script_path, config["config"]["logging"]["filename"])
+    handler = logging.FileHandler(filename=absolute_path)
+
     formatter = logging.Formatter(("%(asctime)s - %(name)s - "
                                    "%(levelname)s - %(message)s"))
     handler.setFormatter(formatter)
@@ -100,7 +104,8 @@ def read_segment_list(sr: sr_config.Sr, segment_name: str):
     return segments
 
 
-def load_data(config):
+def load_data():
+    config, server = load_config()
     device = urlparse(config["config"]["host"])
 
     logger = load_logger(config)
@@ -129,11 +134,11 @@ def load_data(config):
     logger.info("System uptime is " +
                 str(timedelta(seconds=system_time.uptime.uptime)))
 
-    policies: List[Policy] = []
+    policies = []
     for policy in sr_config_mapping.traffic_engineering.policies.policy:
-        paths: List[CandidatePath] = []
+        paths = []
         for preference in policy.candidate_paths.preferences.preference:
-            segments: List[SegmentList] = []
+            segments = []
             for pathinfo in preference.path_infos.path_info:
                 segments.append(SegmentList(preference.path_index.__str__(),
                                             read_segment_list(sr_config_mapping, pathinfo.segment_list_name)))
@@ -143,8 +148,12 @@ def load_data(config):
     if len(policies) > 0:
         print(policies[0].__str__())
 
-    requests.post("localhost:8080/policies", data=policies)
+    if server is None or server == "":
+        server = "http://localhost:5000"
+
+    string = "[" + ",".join(policy.json() for policy in policies) + "]"
+    requests.post(server + "/update", data=string)
 
 
 if __name__ == "__main__":
-    load_data(load_config())
+    load_data()
