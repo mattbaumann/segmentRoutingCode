@@ -1,4 +1,5 @@
 import os
+import json
 import subprocess
 from pathlib import Path
 
@@ -12,6 +13,9 @@ app.config.from_object('config')
 
 routes = Blueprint('index', __name__, template_folder='templates')
 
+raw_json = '[{"name": "P1", "color": 1, "paths": [{"preference": 10, "hops": [{"name": "Plist-1", "labels": [{"label": 16009, "type": "mpls-label"},{"label": 16004, "type": "mpls-label"},{"label": 16005, "type": "mpls-label"}]}]}]}, {"name": "P2", "color": 1, "paths": [{"preference": 10, "hops": [{"name": "Plist-1", "labels": [{"label": 16009, "type": "mpls-label"},{"label": 16004, "type": "mpls-label"},{"label": 16005, "type": "mpls-label"}]}]}]}]'
+nice_json = json.loads(raw_json)
+
 
 @routes.route('/')
 def home():
@@ -20,6 +24,25 @@ def home():
 
 @routes.route('/about')
 def about():
+    for policy in nice_json:
+        print("POLICY: " + str(policy))
+        insert_into_policy = Policy(str(policy['name']), str(policy['color']), '', '', '')
+        db.session.add(insert_into_policy)
+
+        for candidate_path in policy['paths']:
+            print("CANDIDATE_PATH: " + str(candidate_path))
+            insert_into_candidate_path = CandidatePath(str(candidate_path['preference']))
+            insert_into_policy.candidate_path.append(insert_into_candidate_path)
+            db.session.add(insert_into_candidate_path)
+
+            for hop in candidate_path['hops']:
+                print("HOP: " + str(hop))
+                insert_into_segment_list = SegmentList(str(hop['name']), str(hop['labels']))
+                insert_into_candidate_path.segment_list.append(insert_into_segment_list)
+                db.session.add(insert_into_segment_list)
+
+        db.session.commit()
+
     return render_template('/static/about.html')
 
 
@@ -59,6 +82,7 @@ def show_candidate_path(name, candidate_path_id):
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>/segmentlist/<segment_list_id>')
 def show_segment_list(name, candidate_path_id, segment_list_id):
     segment_list = SegmentList.query.join(CandidatePath, CandidatePath.id == SegmentList.candidate_path_id).filter(SegmentList.id == segment_list_id).all()
+    print(segment_list)
     return render_template('show/segment_list.html',
                            name=name,
                            candidate_path=candidate_path_id,
