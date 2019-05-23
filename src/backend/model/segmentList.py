@@ -16,3 +16,8 @@ class SegmentList(object):
 
     def json(self):
         return "{name: %s, labels: %s" % (self.name, "[" + ",".join(path.json() for path in self.labels) + "]}")
+
+    @classmethod
+    def parse_json(cls, value: dict):
+        return SegmentList(value["name"],
+                           list(map(lambda item: Label.parse_json(item), value["labels"])))

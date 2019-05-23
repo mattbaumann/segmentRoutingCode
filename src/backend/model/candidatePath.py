@@ -16,3 +16,8 @@ class CandidatePath:
 
     def json(self):
         return "{preference: %d, hops: %s" % (self.preference, "[" + ",".join(path.json() for path in self.hops) + "]}")
+
+    @classmethod
+    def parse_json(cls, value: dict):
+        path = CandidatePath(value["preference"],
+                             list(map(lambda item: SegmentList.parse_json(item), value["hops"])))

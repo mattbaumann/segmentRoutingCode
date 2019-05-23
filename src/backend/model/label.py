@@ -11,3 +11,7 @@ class Label(object):
 
     def json(self):
         return "{label: %d, type: %s}" % (self.label, self.type)
+
+    @classmethod
+    def parse_json(cls, value: dict):
+        return Label(value["label"], value["type"])

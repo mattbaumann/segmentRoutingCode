@@ -50,4 +50,8 @@ def load_config():
 
     convert_bool(yaml)
 
-    return yaml, args.s
+    # Override config with command parameters
+    if args.s is not None and args.s != "":
+        yaml["config"]["server"] = args.s
+
+    return yaml

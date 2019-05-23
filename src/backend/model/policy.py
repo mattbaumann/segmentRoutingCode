@@ -24,3 +24,9 @@ class Policy(object):
     def json(self):
         return "{name: %s, color: %d, paths: %s" % (self.name, self.color,
                                                     "[" + ",".join(path.json() for path in self.paths) + "]}")
+
+    @classmethod
+    def parse_json(cls, values: dict):
+        return Policy(values["name"],
+                      values["color"],
+                      list(map(lambda item: CandidatePath.parse_json(item), values["paths"])))

@@ -3,23 +3,25 @@
 from datetime import timedelta
 from urllib.parse import urlparse
 
-import requests
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_segment_routing_ms_cfg as sr_config
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
+from src.backend import communication
 from src.backend.configuration import load_config
 from src.backend.logConfig import load_logger
 from src.backend.parser import parse_policy
 
 
 def load_data():
-    config, server = load_config()
+    config = load_config()
     device = urlparse(config["config"]["host"])
 
     logger = load_logger(config)
     logger.info(f"Connect to {device}")
+
+    communication.receive_command(config)
 
     # create NETCONF session
     provider = NetconfServiceProvider(address=device.hostname,
@@ -33,14 +35,7 @@ def load_data():
     logger.info("System uptime is " + str(read_system_time(crud, provider)))
     policies = parse_policy(read_policy(crud, provider))
 
-    if len(policies) > 0:
-        print(policies[0].__str__())
-
-    if server is None or server == "":
-        server = "http://localhost:5000"
-
-    string = "[" + ",".join(policy.json() for policy in policies) + "]"
-    requests.post(server + "/update", data=string)
+    communication.send_answer(policies, config)
 
 
 def read_policy(service: CRUDService, provider: NetconfServiceProvider):
