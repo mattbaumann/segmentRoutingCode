@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Show config</h1>
+    <h1>Show Policy</h1>
     <table class="table table-striped">
         <tr>
             <th>Name</th>
@@ -11,13 +11,15 @@
             <th>Availability</th>
             <th>Show Candidate Path</th>
         </tr>
-        <tr>
-            <td>{{policy['name']}}</td>
-            <td>{{policy['color']}}</td>
-            <td>{{policy['bandwidth']}}</td>
-            <td>{{policy['latency']}}</td>
-            <td>{{policy['availability']}}</td>
-            <td><a href="/show/policy/{{name}}/candidatepath/{{policy['id']}}" class="btn btn-primary pull-left" type="submit" value="Policy Detail">Policy Detail</a> </td>
-        </tr>
+        {% for item in policy %}
+            <tr>
+                <td>{{item['name']}}</td>
+                <td>{{item['color']}}</td>
+                <td>{{item['bandwidth']}}</td>
+                <td>{{item['latency']}}</td>
+                <td>{{item['availability']}}</td>
+                <td><a href="/show/policy/{{item['name']}}/candidatepath/{{item['id']}}" class="btn btn-primary pull-left" type="submit" value="Policy Detail">Policy Detail</a></td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}
