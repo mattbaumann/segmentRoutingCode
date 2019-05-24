@@ -22,7 +22,7 @@ def receive_command(config: dict):
     """ Questions the server which command should be executed """
     response = requests.post(config["config"]["server"] + "/command", data=config["version"])
     response.raise_for_status()
-    if response.status_code == 240:
+    if response.status_code == 204:
         return Commands.READ, None
     else:
         return Commands.WRITE, parse_json(response)
