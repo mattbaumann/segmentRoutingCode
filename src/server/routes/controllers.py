@@ -1,6 +1,7 @@
-import os
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 from flask import Flask, Blueprint, render_template, request, abort
@@ -73,8 +74,11 @@ def show_segment_list(name, candidate_path_id, segment_list_id):
 
 @routes.route('/update', methods=['POST'])
 def update():
-    nice_json = json.loads(raw_json)
-    # nice_json = json.loads(request.json)
+    # nice_json = json.loads(raw_json)
+    if request.json is None:
+        return "", BAD_REQUEST
+
+    nice_json = json.loads(request.json)
     if json is None:
         abort(BAD_REQUEST)
     for policy in nice_json:
@@ -92,6 +96,7 @@ def update():
                 db.session.add(insert_into_segment_list)
 
         db.session.commit()
+    return "", OK
 
 
 # 200 OK, wenn config auf router geschrieben wird

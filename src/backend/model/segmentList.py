@@ -15,7 +15,7 @@ class SegmentList(object):
         return "Segment List '%s' with labels {%s}" % (self.name, ",".join(label.__str__() for label in self.labels))
 
     def json(self):
-        return "{name: %s, labels: %s" % (self.name, "[" + ",".join(path.json() for path in self.labels) + "]}")
+        return '{"name": "%s", "labels": %s' % (self.name, "[" + ",".join(path.json() for path in self.labels) + "]}")
 
     @classmethod
     def parse_json(cls, value: dict):
