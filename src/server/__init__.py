@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-# from src.server.routes.controllers import routes as mod_routes
 from server.routes.controllers import routes as mod_routes
 
 app = Flask(__name__)

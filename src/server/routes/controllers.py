@@ -25,8 +25,6 @@ def home():
 
 @routes.route('/about')
 def about():
-
-
     return render_template('/static/about.html')
 
 
@@ -108,11 +106,17 @@ def command():
     return '', NO_CONTENT
 
 
-@routes.route('/execute', methods=['GET', 'POST'])
-def execute():
-    script_path = Path(os.path.dirname(os.path.abspath(__file__)))
-    absolute_path = Path(script_path, "../../backend/backend.py").absolute()
-    args = ["/usr/bin/python3", absolute_path, "-s " + request.url_root]
-    subprocess.Popen(args)
-    return render_template('update/inprogress.html')
-
+@routes.route('/execute/<command>', methods=['POST'])
+def execute(command):
+    if command == 'read':
+        script_path = Path(os.path.dirname(os.path.abspath(__file__)))
+        absolute_path = Path(script_path, "../../backend/backend.py").absolute()
+        args = ["/usr/bin/python3", absolute_path, "-s " + request.url_root]
+        subprocess.Popen(args)
+        return render_template('update/inprogress.html')
+    elif command == 'write':
+        script_path = Path(os.path.dirname(os.path.abspath(__file__)))
+        absolute_path = Path(script_path, "../../backend/backend.py").absolute()
+        args = ["/usr/bin/python3", absolute_path, "-s " + request.url_root]
+        subprocess.Popen(args)
+        return render_template('update/inprogress.html')
