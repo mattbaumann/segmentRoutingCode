@@ -1,6 +1,7 @@
-import os
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 from flask import Flask, Blueprint, render_template, request, abort
@@ -112,7 +113,7 @@ def command():
 def execute():
     script_path = Path(os.path.dirname(os.path.abspath(__file__)))
     absolute_path = Path(script_path, "../../backend/backend.py").absolute()
-    args = ["/usr/bin/python3", absolute_path, "-s " + request.url_root]
+    args = [sys.executable, absolute_path, "-s " + request.url_root]
     subprocess.Popen(args)
     return render_template('update/inprogress.html')
 
