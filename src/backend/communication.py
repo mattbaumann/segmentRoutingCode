@@ -36,6 +36,9 @@ def receive_command(config: dict):
 def parse_json(response: requests.Response):
     """ Parses the JSON transfer format into classes """
     json = response.json()
+    if json is None:
+        return None
+
     policies: List[Policy] = []
     policies.extend(map(lambda obj: Policy.parse_json(obj), json))
     return policies
