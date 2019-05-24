@@ -1,15 +1,18 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Show config</h1>
+    <h1>Show Segment List</h1>
     <table class="table table-striped">
         <tr>
             <th>Name</th>
             <th>Show Candidate Path</th>
         </tr>
-        <tr>
-            <td>{{segment_list['name']}}</td>
-            <td><a href="/show/candidatepath/{{config['id']}}" class="btn btn-primary pull-left" type="submit" value="Policy Detail">Policy Detail</a> </td>
-        </tr>
+        {% for item in segment_list %}
+            <tr>
+                <td>{{item['name']}}</td>
+                <td>{{item['labels']}}</td>
+            </tr>
+        {% endfor %}
     </table>
+    <p><a href="/show/policy/{{name}}/candidatepath/{{candidate_path}}" class="btn btn-primary pull-left" type="submit" value="Back">Go back</a></p>
 {% endblock %}
