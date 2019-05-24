@@ -1,7 +1,7 @@
 version: 1
 config:
   host: "ssh://system:system@10.20.0.170:22"
-  server: "http://localhost:5000"
+  server: "http://localhost:5000/"
 
   logging:
     verbose: On

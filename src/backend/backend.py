@@ -27,8 +27,7 @@ def main():
 
     if command == Commands.READ:
         policies = parse_policy(read_policy(crud, provider))
-        communication.send_answer(policies, config)
-    else:
+        communication.send_answer(policies, config, logger)
 
 
 def prepare_connection(config: dict, logger: Logger):

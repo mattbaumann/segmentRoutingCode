@@ -22,7 +22,7 @@ class Policy(object):
                                                           ",".join(path.__str__() for path in self.paths))
 
     def json(self):
-        return "{name: %s, color: %d, paths: %s" % (self.name, self.color,
+        return '{"name": "%s", "color": %d, "paths": %s' % (self.name, self.color,
                                                     "[" + ",".join(path.json() for path in self.paths) + "]}")
 
     @classmethod
