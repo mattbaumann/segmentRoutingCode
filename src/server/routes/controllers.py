@@ -1,13 +1,12 @@
 import json
 import os
 import subprocess
-import sys
 from pathlib import Path
 
-from flask import Flask, Blueprint, render_template, request, abort
+from flask import Flask, Blueprint, render_template, request, abort, jsonify
 
-from src.server.extension.db_connection import db, Policy, CandidatePath, SegmentList
-from src.server.utils.http_status import BAD_REQUEST, OK, NO_CONTENT
+from src.server.extension.db_connection import db, Policy, CandidatePath, SegmentList, LabelList
+from src.server.utils.http_status import BAD_REQUEST, OK
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -15,6 +14,7 @@ app.config.from_object('config')
 routes = Blueprint('index', __name__, template_folder='templates')
 
 command = OK
+command_operation = ''
 
 raw_json = '[{"name": "P1", "color": 1, "paths": [{"preference": 10, "hops": [{"name": "Plist-1", "labels": [{"label": 16009, "type": "mpls-label"},{"label": 16004, "type": "mpls-label"},{"label": 16005, "type": "mpls-label"}]}]}]}, {"name": "P2", "color": 1, "paths": [{"preference": 10, "hops": [{"name": "Plist-1", "labels": [{"label": 16009, "type": "mpls-label"},{"label": 16004, "type": "mpls-label"},{"label": 16005, "type": "mpls-label"}]}]}]}]'
 
@@ -31,16 +31,22 @@ def about():
 
 @routes.route('/testpolicy')
 def testpolicy():
-    test_policy = Policy('Policy_2', 123, 123, 123, 123)
-    test_candidate_path = CandidatePath(123)
-    test_segment_list = SegmentList('ItFinallyWorks')
+    test_policy = Policy('Policy_1', 111, 222, 333, 444)
+    test_candidate_path = CandidatePath(555)
+    test_segment_list = SegmentList('Segment List 1')
+    test_label_list = LabelList(8888)
+    test_label_list2 = LabelList(9999)
 
     test_policy.candidate_path.append(test_candidate_path)
     test_candidate_path.segment_list.append(test_segment_list)
+    test_segment_list.label_list.append(test_label_list)
+    test_segment_list.label_list.append(test_label_list2)
 
     db.session.add(test_policy)
     db.session.add(test_candidate_path)
     db.session.add(test_segment_list)
+    db.session.add(test_label_list)
+    db.session.add(test_label_list2)
     db.session.commit()
 
     return 'insert policy into db'
@@ -65,11 +71,14 @@ def show_candidate_path(name, candidate_path_id):
 @routes.route('/show/policy/<name>/candidatepath/<candidate_path_id>/segmentlist/<segment_list_id>')
 def show_segment_list(name, candidate_path_id, segment_list_id):
     segment_list = SegmentList.query.join(CandidatePath, CandidatePath.id == SegmentList.candidate_path_id).filter(SegmentList.id == segment_list_id).all()
-    print(segment_list)
+    label_list = LabelList.query.join(SegmentList, SegmentList.id == LabelList.segment_list_id).filter(LabelList.id == segment_list_id).all()
+    for item in label_list:
+        print(item.label)
     return render_template('show/segment_list.html',
                            name=name,
                            candidate_path=candidate_path_id,
-                           segment_list=segment_list)
+                           segment_list=segment_list,
+                           label_list=label_list)
 
 
 @routes.route('/update', methods=['POST'])
@@ -101,14 +110,29 @@ def update():
 
 # 200 OK, wenn config auf router geschrieben wird
 # 204 NO_CONTENT, wenn auf dem router die config auf dem router gelesen
-@routes.route('/command', methods=['POST'])
+@routes.route('/command', methods=['GET', 'POST'])
 def command():
+    # TODO db auslesen und in json schreiben
+    policy_query = Policy.query.all()
+
+    return jsonify(json_list=[i.serialize for i in policy_query])
+
+    # for policy in policy_query:
+    #    for candidate_path in policy.candidate_path:
+    #        return '{"name": "%s", "color": %d, "paths": %s' % (policy.name, self.color, "[" + ",".join(path.json() for path in self.paths) + "]}")
+    #         print(candidate_path.preference)
+    #         for segment_list in candidate_path.segment_list:
+    #             print(segment_list.labels)
+    # return "200 OK"
+
+    # TODO
+    # return '', NO_CONTENT
     # if status_code == OK:
     #     return 'write config'
     # elif status_code == NO_CONTENT:
     #     return 'update config'
 
-    return '', NO_CONTENT
+    # return '', NO_CONTENT
 
 
 @routes.route('/execute/<command>', methods=['POST'])

@@ -7,11 +7,13 @@
             <th>Name</th>
             <th>Show Candidate Path</th>
         </tr>
-        {% for item in segment_list %}
-            <tr>
-                <td>{{item['name']}}</td>
-                <td>{{item['labels']}}</td>
-            </tr>
+        {% for segment in segment_list %}
+            {% for label in label_list %}
+                <tr>
+                    <td>{{segment['name']}}</td>
+                    <td>{{label['label']}}</td>
+                </tr>
+            {% endfor %}
         {% endfor %}
     </table>
     <p><a href="/show/policy/{{name}}/candidatepath/{{candidate_path}}" class="btn btn-primary pull-left" type="submit" value="Back">Go back</a></p>
