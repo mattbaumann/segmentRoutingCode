@@ -9,6 +9,7 @@ from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 
+from backend.writer import write_policy
 from src.backend import communication
 from src.backend.communication import Commands
 from src.backend.configuration import load_config
@@ -18,16 +19,23 @@ from src.backend.parser import parse_policy
 
 def main():
     config = load_config()
-
     logger: Logger = load_logger(config)
 
-    command, request = communication.receive_command(config)
-
+    command, policy = communication.receive_command(config)
     provider, crud = prepare_connection(config, logger)
 
     if command == Commands.READ:
         policies = parse_policy(read_policy(crud, provider))
         communication.send_answer(policies, config, logger)
+    else:
+        if command == Commands.WRITE:
+            if policy is None:
+                raise Exception("No content supplied, add JSON Body to Message")
+
+            model = write_policy(config, policy)
+            crud.create(provider, model)
+        else:
+            raise Exception("Unknown command")
 
 
 def prepare_connection(config: dict, logger: Logger):
@@ -44,6 +52,7 @@ def prepare_connection(config: dict, logger: Logger):
     logger.info("System uptime is " + str(read_system_time(crud, provider)))
     logger.info(f"Connect to {device}")
     return provider, crud
+
 
 def read_policy(service: CRUDService, provider: NetconfServiceProvider):
     sr_config_mapping = sr_config.Sr()
