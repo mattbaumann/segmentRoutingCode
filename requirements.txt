@@ -12,7 +12,7 @@ MarkupSafe==1.1.1
 pyang==1.6
 pybind11==2.2.4
 pygit==0.1
-Pygments==2.3.1
+Pygments==2.7.4
 python-git==2018.2.1
 pytz==2019.1
 rstr==2.2.6
